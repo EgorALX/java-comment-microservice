@@ -2,13 +2,13 @@ package ru.comments.commentservice.exception.controller;
 
 import jakarta.validation.ValidationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import ru.users.userservice.exception.model.ApiError;
-import ru.users.userservice.exception.model.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.comments.commentservice.exception.model.ApiError;
+import ru.comments.commentservice.exception.model.NotFoundException;
 
 @Slf4j
 @RestControllerAdvice
