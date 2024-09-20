@@ -1,6 +1,5 @@
 package ru.comments.commentservice.controller;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,7 @@ public class CommentController {
     @GetMapping
     public List<CommentDto> getComments(@RequestParam(required = false, defaultValue = "1") Integer page,
                                         @RequestParam(required = false, defaultValue = "10") Integer size,
-                                        @RequestParam(required = false, name = "news_Id") Integer newsId) {
+                                        @RequestParam(required = false, name = "news_Id") @Positive Integer newsId) {
         log.info("Starting getComments method. Getting comments with params: page={}, size={}, newsId={}",
                 page, size, newsId);
         PageRequest pageRequest = PageRequest.of(page - 1, size);
@@ -38,7 +37,7 @@ public class CommentController {
     }
 
     @GetMapping("/{commentId}")
-    public CommentDto getById(@PathVariable @Positive Integer commentId) {
+    public CommentDto getById(@PathVariable @Positive int commentId) {
         log.info("Starting getById method. Getting user by commentId={}", commentId);
         CommentDto comment = commentService.getById(commentId);
         log.info("Completed getById method successfully. Result: {}", comment);
@@ -55,16 +54,17 @@ public class CommentController {
     }
 
     @PatchMapping("/{commentId}")
-    public UpdateCommentDto update(@PathVariable @Positive Integer commentId,
+    public CommentDto update(@PathVariable @Positive int commentId,
                                    @Valid @RequestBody UpdateCommentDto dto) {
         log.info("Starting update method. Updating userId={}", commentId);
-        UpdateCommentDto comment = commentService.update(commentId, dto);
+        CommentDto comment = commentService.update(commentId, dto);
         log.info("Completed update method successfully. Result: {}", comment);
         return comment;
     }
 
     @DeleteMapping("/{commentId}")
-    public void removeById(@PathVariable @Positive Integer commentId) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeById(@PathVariable @Positive int commentId) {
         log.info("Starting removeById method. Removing commentId={}", commentId);
         commentService.removeById(commentId);
         log.info("Completed removeById method successfully");

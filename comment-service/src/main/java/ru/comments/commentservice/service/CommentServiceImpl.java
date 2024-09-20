@@ -1,38 +1,65 @@
 package ru.comments.commentservice.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.comments.commentservice.dto.CommentDto;
 import ru.comments.commentservice.dto.NewCommentDto;
 import ru.comments.commentservice.dto.UpdateCommentDto;
+import ru.comments.commentservice.exception.model.NotFoundException;
+import ru.comments.commentservice.mapper.CommentMapper;
+import ru.comments.commentservice.model.Comment;
+import ru.comments.commentservice.repository.CommentRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
+
+    private final CommentMapper commentMapper;
+
+    private final CommentRepository commentRepository;
 
     @Override
     public List<CommentDto> getUsers(Integer newsId, PageRequest pageRequest) {
-        return List.of();
+        List<Comment> comments = commentRepository.findAllByNewsId(newsId, pageRequest);
+        return comments.stream().map(commentMapper::toDto).collect(Collectors.toList());
     }
 
     @Override
     public CommentDto getById(Integer commentId) {
-        return null;
+        Comment comment = commentRepository
+                .findById(commentId).orElseThrow(() -> new NotFoundException("Comment " + commentId + " not found"));
+        return commentMapper.toDto(comment);
     }
 
     @Override
     public CommentDto add(NewCommentDto dto) {
-        return null;
+        Comment comment = commentMapper.toComment(dto);
+        Comment newComment = commentRepository.save(comment);
+        return commentMapper.toDto(newComment);
     }
 
     @Override
-    public UpdateCommentDto update(Integer commentId, UpdateCommentDto dto) {
-        return null;
+    public CommentDto update(Integer commentId, UpdateCommentDto dto) {
+        Comment comment = commentRepository
+                .findById(commentId).orElseThrow(() -> new NotFoundException("Comment " + commentId + " not found"));
+        if (dto.getUserId() != null) {
+            comment.setUserId(dto.getUserId());
+        }
+        if (dto.getNewsId() != null) {
+            comment.setNewsId(dto.getNewsId());
+        }
+        if (dto.getUserId() != null) {
+            comment.setUserId(dto.getUserId());
+        }
+        return commentMapper.toDto(comment);
     }
 
     @Override
     public void removeById(Integer commentId) {
-
+        commentRepository.deleteById(commentId);
     }
 }
