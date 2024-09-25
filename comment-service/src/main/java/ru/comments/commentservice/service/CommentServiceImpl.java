@@ -23,7 +23,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
 
     @Override
-    public List<CommentDto> getUsers(Integer newsId, PageRequest pageRequest) {
+    public List<CommentDto> getComments(Integer newsId, PageRequest pageRequest) {
         List<Comment> comments = commentRepository.findAllByNewsId(newsId, pageRequest);
         return comments.stream().map(commentMapper::toDto).collect(Collectors.toList());
     }

@@ -8,7 +8,7 @@ import ru.comments.commentservice.dto.UpdateCommentDto;
 import java.util.List;
 
 public interface CommentService {
-    List<CommentDto> getUsers(Integer newsId, PageRequest pageRequest);
+    List<CommentDto> getComments(Integer newsId, PageRequest pageRequest);
 
     CommentDto getById(Integer commentId);
 

@@ -31,7 +31,7 @@ public class CommentController {
         log.info("Starting getComments method. Getting comments with params: page={}, size={}, newsId={}",
                 page, size, newsId);
         PageRequest pageRequest = PageRequest.of(page - 1, size);
-        List<CommentDto> comments = commentService.getUsers(newsId, pageRequest);
+        List<CommentDto> comments = commentService.getComments(newsId, pageRequest);
         log.info("Completed getComments method successfully. Results: {}", comments);
         return comments;
     }
