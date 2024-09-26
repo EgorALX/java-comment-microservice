@@ -1,3 +1,5 @@
+package ru.comments.commentservice.comments;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
@@ -8,9 +10,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.comments.commentservice.controller.CommentController;
-import ru.comments.commentservice.dto.CommentDto;
 import ru.comments.commentservice.dto.NewCommentDto;
 import ru.comments.commentservice.dto.UpdateCommentDto;
+import ru.comments.commentservice.dto.CommentDto;
 import ru.comments.commentservice.service.CommentService;
 
 import java.nio.charset.StandardCharsets;
@@ -30,17 +32,17 @@ public class CommentControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
     @MockBean
     private CommentService commentService;
 
-    @MockBean
-    private CommentController commentController;
+    private final CommentDto commentDto = new CommentDto(1, 1, "desc");
 
-    private final CommentDto commentDto = new CommentDto(1, 2, "description");
+    private final NewCommentDto newCommentDto = new NewCommentDto(1, 1, "desc");
 
-    private final NewCommentDto newCommentDto = new NewCommentDto(1, 2, "description");
+    private final UpdateCommentDto updateCommentDto = new UpdateCommentDto(2, 2, "newDesc");
 
-    private final UpdateCommentDto updateCommentDto = new UpdateCommentDto(1, 2, "description");
+    private final CommentDto updatedCommentDto = new CommentDto(2, 2, "newDesc");
 
     @Test
     @SneakyThrows
@@ -52,24 +54,24 @@ public class CommentControllerTest {
                         .content(objectMapper.writeValueAsString(newCommentDto)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.userId", is(commentDto.getUserId()), Integer.class))
-                .andExpect(jsonPath("$.newsId", is(commentDto.getNewsId())))
+                .andExpect(jsonPath("$.user_id", is(commentDto.getUserId()), Integer.class))
+                .andExpect(jsonPath("$.news_id", is(commentDto.getNewsId())))
                 .andExpect(jsonPath("$.description", is(commentDto.getDescription())));
     }
 
     @Test
     @SneakyThrows
     void updateCommentTest() {
-        when(commentService.update(any(Integer.class), any(UpdateCommentDto.class))).thenReturn(commentDto);
+        when(commentService.update(any(Integer.class), any(UpdateCommentDto.class))).thenReturn(updatedCommentDto);
 
         mockMvc.perform(patch("/comments/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateCommentDto)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.userId", is(updateCommentDto.getUserId())))
-                .andExpect(jsonPath("$.description", is(updateCommentDto.getDescription())))
-                .andExpect(jsonPath("$.newsId", is(updateCommentDto.getNewsId().toString())));
+                .andExpect(jsonPath("$.user_id", is(updatedCommentDto.getUserId()), Integer.class))
+                .andExpect(jsonPath("$.news_id", is(updatedCommentDto.getNewsId())))
+                .andExpect(jsonPath("$.description", is(updatedCommentDto.getDescription())));
     }
 
     @Test
@@ -89,15 +91,18 @@ public class CommentControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.userId", is(commentDto.getUserId()), Integer.class))
-                .andExpect(jsonPath("$.newsId", is(commentDto.getNewsId())))
+                .andExpect(jsonPath("$.user_id", is(commentDto.getUserId()), Integer.class))
+                .andExpect(jsonPath("$.news_id", is(commentDto.getNewsId())))
                 .andExpect(jsonPath("$.description", is(commentDto.getDescription())));
     }
-    void getUsersTest() throws Exception {
+
+    @SneakyThrows
+    @Test
+    void getCommentsTest() {
         int page = 1;
         int size = 10;
         PageRequest pageRequest = PageRequest.of(page, size);
-        when(commentService.getComments(any(Integer.class), any()))
+        when(commentService.getComments(any(Integer.class), any(PageRequest.class)))
                 .thenReturn(List.of(commentDto));
 
         mockMvc.perform(get("/comments")
@@ -105,9 +110,8 @@ public class CommentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()", is(1)))
-                .andExpect(jsonPath("$.[0].userId", is(commentDto.getUserId()), Integer.class))
-                .andExpect(jsonPath("$.[0].newsId", is(commentDto.getNewsId())))
+                .andExpect(jsonPath("$.[0].news_id", is(commentDto.getNewsId()), Integer.class))
+                .andExpect(jsonPath("$.[0].user_id", is(commentDto.getUserId())))
                 .andExpect(jsonPath("$.[0].description", is(commentDto.getDescription())));
     }
-
 }

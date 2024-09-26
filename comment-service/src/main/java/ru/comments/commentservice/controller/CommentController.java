@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.comments.commentservice.dto.CommentDto;
@@ -44,7 +45,7 @@ public class CommentController {
         return comment;
     }
 
-    @PostMapping
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public CommentDto add(@Valid @RequestBody NewCommentDto dto) {
         log.info("Starting add method. Creating comment: {}", dto.toString());
