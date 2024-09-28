@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.comments.commentservice.dto.CommentDto;
@@ -52,6 +53,12 @@ public class CommentController {
         CommentDto comment = commentService.add(dto);
         log.info("Completed add method successfully. Result: {}", comment);
         return comment;
+    }
+
+    @PostMapping
+    public ResponseEntity<CommentDto> createComment(@RequestBody NewCommentDto request) {
+        commentService.createComment(request);
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/{commentId}")

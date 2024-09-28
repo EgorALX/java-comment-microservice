@@ -14,6 +14,10 @@ public interface CommentService {
 
     CommentDto add(NewCommentDto dto);
 
+    void createComment(NewCommentDto commentDto);
+
+    void deleteCommentsByNewsId(Integer newsId);
+
     CommentDto update(Integer commentId, UpdateCommentDto dto);
 
     void removeById(Integer commentId);

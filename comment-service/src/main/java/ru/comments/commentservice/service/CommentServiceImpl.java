@@ -2,6 +2,8 @@ package ru.comments.commentservice.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import ru.comments.commentservice.dto.CommentDto;
 import ru.comments.commentservice.dto.NewCommentDto;
@@ -22,6 +24,8 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
 
+    private KafkaTemplate<String, NewCommentDto> kafkaTemplate;
+
     @Override
     public List<CommentDto> getComments(Integer newsId, PageRequest pageRequest) {
         List<Comment> comments = commentRepository.findAllByNewsId(newsId, pageRequest);
@@ -40,6 +44,20 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentMapper.toComment(dto);
         Comment newComment = commentRepository.save(comment);
         return commentMapper.toDto(newComment);
+    }
+
+    @Override
+    @KafkaListener(topics = "create-comment-topic", containerFactory = "createCommentKafkaListenerContainerFactory")
+    public void createComment(NewCommentDto commentDto) {
+        Integer newsId = commentDto.getNewsId();
+
+        Comment comment = commentMapper.toComment(commentDto);
+        commentRepository.save(comment);
+    }
+
+    @Override
+    public void deleteCommentsByNewsId(Integer newsId) {
+        commentRepository.deleteAllByNewsId(newsId);
     }
 
     @Override
