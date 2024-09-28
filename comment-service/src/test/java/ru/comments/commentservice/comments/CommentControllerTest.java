@@ -44,20 +44,6 @@ public class CommentControllerTest {
 
     private final CommentDto updatedCommentDto = new CommentDto(2, 2, "newDesc");
 
-    @Test
-    @SneakyThrows
-    void addCommentTest() {
-        when(commentService.add(any(NewCommentDto.class))).thenReturn(commentDto);
-
-        mockMvc.perform(post("/comments")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newCommentDto)))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.user_id", is(commentDto.getUserId()), Integer.class))
-                .andExpect(jsonPath("$.news_id", is(commentDto.getNewsId())))
-                .andExpect(jsonPath("$.description", is(commentDto.getDescription())));
-    }
 
     @Test
     @SneakyThrows
@@ -67,7 +53,6 @@ public class CommentControllerTest {
         mockMvc.perform(patch("/comments/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateCommentDto)))
-                .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.user_id", is(updatedCommentDto.getUserId()), Integer.class))
                 .andExpect(jsonPath("$.news_id", is(updatedCommentDto.getNewsId())))

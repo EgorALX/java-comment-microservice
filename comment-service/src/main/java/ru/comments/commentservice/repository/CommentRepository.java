@@ -12,4 +12,5 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
 
     List<Comment> findAllByNewsId(Integer newsId, PageRequest pageRequest);
 
+    void deleteAllByNewsId(Integer newsId);
 }
