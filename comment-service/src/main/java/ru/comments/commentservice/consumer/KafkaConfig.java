@@ -53,15 +53,15 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, NewsDeletionEvent> deleteNewsConsumerFactory() {
+    public ConsumerFactory<String, String> deleteNewsConsumerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "news-delete-group");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(),
-                new JsonDeserializer<>(NewsDeletionEvent.class));
+                new StringDeserializer());
     }
 
     @Bean
@@ -73,8 +73,8 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, NewsDeletionEvent> deleteNewsKafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, NewsDeletionEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, String> deleteNewsKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(deleteNewsConsumerFactory());
         factory.setConcurrency(partitionCount);
         return factory;

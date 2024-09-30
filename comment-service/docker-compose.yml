@@ -10,24 +10,25 @@ services:
     build: .
     container_name: comment-service
     ports:
-      - "8080:8080"
+      - "8081:8081"
     depends_on:
-      - db
+      - db-comments
       - kafka
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/comment-service
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-comments:5432/comment-service
       - SPRING_DATASOURCE_USERNAME=test
       - SPRING_DATASOURCE_PASSWORD=test
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:19092
-  db:
+  db-comments:
     image: postgres:13.7-alpine
-    container_name: postgres
+    container_name: postgres-comments
     ports:
-      - "6541:5432"
+      - "6542:5432"
     environment:
       POSTGRES_PASSWORD: test
       POSTGRES_USER: test
       POSTGRES_DB: comment-service
+
   zookeeper:
     image: confluentinc/cp-zookeeper:5.3.1
     container_name: zookeeper
