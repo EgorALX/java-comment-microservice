@@ -44,6 +44,19 @@ public class CommentControllerTest {
 
     private final CommentDto updatedCommentDto = new CommentDto(2, 2, "newDesc");
 
+    @Test
+    @SneakyThrows
+    void addCommentTest() {
+        when(commentService.add(any(NewCommentDto.class))).thenReturn(commentDto);
+
+        mockMvc.perform(post("/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newCommentDto)))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.user_id", is(commentDto.getUserId()), Integer.class))
+                .andExpect(jsonPath("$.news_id", is(commentDto.getNewsId())))
+                .andExpect(jsonPath("$.description", is(commentDto.getDescription())));
+    }
 
     @Test
     @SneakyThrows
