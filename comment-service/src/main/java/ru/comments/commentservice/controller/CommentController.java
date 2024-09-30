@@ -7,8 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.comments.commentservice.dto.CommentDto;
@@ -26,6 +24,49 @@ import java.util.List;
 public class CommentController {
 
     private final CommentService commentService;
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(
+            summary = "Создание комментария",
+            description = "Тело запроса: news_id (Integer) – Идентификатор новости, " +
+                    "user_id (Integer) – Идентификатор автора комментария," +
+                    " comment (String) – Текст комментария"
+    )
+    public CommentDto add(@Valid @RequestBody NewCommentDto dto) {
+        log.info("Starting add method. Creating comment: {}", dto.toString());
+        CommentDto comment = commentService.add(dto);
+        log.info("Completed add method successfully. Result: {}", comment);
+        return comment;
+    }
+
+    @PatchMapping("/{commentId}")
+    @Operation(
+            summary = "Обновление информации о комментарии",
+            description = "Параметры: comment_id (Integer) – Идентификатор комментария, " +
+                    "Тело запроса: news_id (Integer) – Идентификатор новости, " +
+                    " user_id (Integer) – Идентификатор автора комментария, " +
+                    " comment (String) – Текст комментария"
+    )
+    public CommentDto update(@PathVariable @Positive int commentId,
+                             @Valid @RequestBody UpdateCommentDto dto) {
+        log.info("Starting update method. Updating userId={}", commentId);
+        CommentDto comment = commentService.update(commentId, dto);
+        log.info("Completed update method successfully. Result: {}", comment);
+        return comment;
+    }
+
+    @DeleteMapping("/{commentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(
+            summary = "Удаление комментария",
+            description = "Параметры: comment_id (Integer) – Идентификатор комментария"
+    )
+    public void removeById(@PathVariable @Positive int commentId) {
+        log.info("Starting removeById method. Removing commentId={}", commentId);
+        commentService.removeById(commentId);
+        log.info("Completed removeById method successfully");
+    }
 
     @Operation(
             summary = "Получение списка комментариев",
@@ -55,48 +96,5 @@ public class CommentController {
         CommentDto comment = commentService.getById(commentId);
         log.info("Completed getById method successfully. Result: {}", comment);
         return comment;
-    }
-
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    @Operation(
-            summary = "Создание комментария",
-            description = "Тело запроса: news_id (Integer) – Идентификатор новости, " +
-                    "user_id (Integer) – Идентификатор автора комментария," +
-                    " comment (String) – Текст комментария"
-    )
-    public CommentDto add(@Valid @RequestBody NewCommentDto dto) {
-        log.info("Starting add method. Creating comment: {}", dto.toString());
-        CommentDto comment = commentService.add(dto);
-        log.info("Completed add method successfully. Result: {}", comment);
-        return comment;
-    }
-
-    @PatchMapping("/{commentId}")
-    @Operation(
-            summary = "Обновление информации о комментарии",
-            description = "Параметры: comment_id (Integer) – Идентификатор комментария, " +
-                    "Тело запроса: news_id (Integer) – Идентификатор новости, " +
-                    " user_id (Integer) – Идентификатор автора комментария, " +
-                    " comment (String) – Текст комментария"
-    )
-    public CommentDto update(@PathVariable @Positive int commentId,
-                                   @Valid @RequestBody UpdateCommentDto dto) {
-        log.info("Starting update method. Updating userId={}", commentId);
-        CommentDto comment = commentService.update(commentId, dto);
-        log.info("Completed update method successfully. Result: {}", comment);
-        return comment;
-    }
-
-    @DeleteMapping("/{commentId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(
-            summary = "Удаление комментария",
-            description = "Параметры: comment_id (Integer) – Идентификатор комментария"
-    )
-    public void removeById(@PathVariable @Positive int commentId) {
-        log.info("Starting removeById method. Removing commentId={}", commentId);
-        commentService.removeById(commentId);
-        log.info("Completed removeById method successfully");
     }
 }
