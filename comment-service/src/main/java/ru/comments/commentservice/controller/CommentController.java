@@ -1,5 +1,6 @@
 package ru.comments.commentservice.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,12 @@ public class CommentController {
 
     private final CommentService commentService;
 
+    @Operation(
+            summary = "Получение списка комментариев",
+            description = "Параметры: page (Integer) – Номер страницы для пагинации, " +
+                    "size (Integer) – Количество записей на странице, " +
+                    "news_id (Integer) – Значение для фильтрация по ID новости"
+    )
     @GetMapping
     public List<CommentDto> getComments(@RequestParam(required = false, defaultValue = "1") Integer page,
                                         @RequestParam(required = false, defaultValue = "10") Integer size,
@@ -39,6 +46,10 @@ public class CommentController {
     }
 
     @GetMapping("/{commentId}")
+    @Operation(
+            summary = "Получение информации о комментарии",
+            description = "Параметры: comment_id (Integer) – Идентификатор новости"
+    )
     public CommentDto getById(@PathVariable @Positive int commentId) {
         log.info("Starting getById method. Getting user by commentId={}", commentId);
         CommentDto comment = commentService.getById(commentId);
@@ -48,6 +59,12 @@ public class CommentController {
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(
+            summary = "Создание комментария",
+            description = "Тело запроса: news_id (Integer) – Идентификатор новости, " +
+                    "user_id (Integer) – Идентификатор автора комментария," +
+                    " comment (String) – Текст комментария"
+    )
     public CommentDto add(@Valid @RequestBody NewCommentDto dto) {
         log.info("Starting add method. Creating comment: {}", dto.toString());
         CommentDto comment = commentService.add(dto);
@@ -55,13 +72,14 @@ public class CommentController {
         return comment;
     }
 
-    @PostMapping
-    public ResponseEntity<CommentDto> createComment(@RequestBody NewCommentDto request) {
-        commentService.createComment(request);
-        return ResponseEntity.ok().build();
-    }
-
     @PatchMapping("/{commentId}")
+    @Operation(
+            summary = "Обновление информации о комментарии",
+            description = "Параметры: comment_id (Integer) – Идентификатор комментария, " +
+                    "Тело запроса: news_id (Integer) – Идентификатор новости, " +
+                    " user_id (Integer) – Идентификатор автора комментария, " +
+                    " comment (String) – Текст комментария"
+    )
     public CommentDto update(@PathVariable @Positive int commentId,
                                    @Valid @RequestBody UpdateCommentDto dto) {
         log.info("Starting update method. Updating userId={}", commentId);
@@ -72,6 +90,10 @@ public class CommentController {
 
     @DeleteMapping("/{commentId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(
+            summary = "Удаление комментария",
+            description = "Параметры: comment_id (Integer) – Идентификатор комментария"
+    )
     public void removeById(@PathVariable @Positive int commentId) {
         log.info("Starting removeById method. Removing commentId={}", commentId);
         commentService.removeById(commentId);
